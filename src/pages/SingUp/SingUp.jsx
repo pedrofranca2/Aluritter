@@ -104,13 +104,13 @@ function Home() {
         )}
 
         <ButtonStyled>
-          Criar uma nova conta
+          Acessar plataforma
         </ButtonStyled>
       </FormStyled>
       <TextStyled>
-        Já possui um conta?
+        Não possui um conta?
         {' '}
-        <LinkStyled href="blank"><Link to="/singup">Acesse agora!</Link></LinkStyled>
+        <LinkStyled href="blank"><Link to="/">Crie uma agora!</Link></LinkStyled>
       </TextStyled>
     </HomeContainer>
   );
