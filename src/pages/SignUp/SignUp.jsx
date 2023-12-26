@@ -3,22 +3,16 @@ import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import validator from 'validator';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { ButtonStyled } from '../../components/ButtonStyled';
 import { InputStyled } from '../../components/InputStyled';
+import { changeUser } from '../../redux/userSlice';
 
 const FormStyled = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;
-`;
-
-const LinkStyled = styled.a`
-  color: #0ea5e9;
-  font-size: 14px;
-  line-height: 20px;
-  font-weight: 400;
-  font-family: "Roboto", sans-serif;
 `;
 
 const TextStyled = styled.p`
@@ -49,17 +43,23 @@ const HomeContainer = styled.div`
   margin-right: auto;
 `;
 
-function Home() {
+function SignUp() {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+  const dispatch = useDispatch();
+
+  const onSubmit = (data) => {
+    dispatch(changeUser(data));
+  };
+
   return (
     <HomeContainer>
       <TitleStyled>Aluritter</TitleStyled>
-      <FormStyled onSubmit={ handleSubmit() }>
+      <FormStyled>
         <InputStyled
           type="text"
           id="login"
@@ -103,17 +103,29 @@ function Home() {
           </span>
         )}
 
-        <ButtonStyled>
-          Acessar plataforma
+        <ButtonStyled onClick={ handleSubmit(onSubmit) }>
+          <Link to="/">
+            Acessar plataforma
+          </Link>
         </ButtonStyled>
       </FormStyled>
       <TextStyled>
         Não possui um conta?
         {' '}
-        <LinkStyled href="blank"><Link to="/">Crie uma agora!</Link></LinkStyled>
+        <Link
+          to="/signin"
+          style={ {
+            color: '#0ea5e9',
+            fontSize: '14px',
+            lineHeight: '20px',
+            fontWeight: 400,
+            fontFamily: 'Roboto, sans-serif' } }
+        >
+          Crie uma agora!
+        </Link>
       </TextStyled>
     </HomeContainer>
   );
 }
 
-export default Home;
+export default SignUp;
