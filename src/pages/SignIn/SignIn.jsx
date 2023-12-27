@@ -3,8 +3,12 @@ import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import validator from 'validator';
 import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { ButtonStyled } from '../../components/ButtonStyled';
 import { InputStyled } from '../../components/InputStyled';
+import { changeUser } from '../../redux/userSlice';
+import { auth } from '../../services/firebaseConfig';
 
 const FormStyled = styled.form`
   display: flex;
@@ -48,10 +52,24 @@ function SignIn() {
     formState: { errors },
   } = useForm();
 
+  const [
+    signInWithEmailAndPassword,
+    user,
+    loading,
+    error,
+  ] = useSignInWithEmailAndPassword(auth);
+
+  const dispatch = useDispatch();
+
+  const onSubmit = (data) => {
+    dispatch(changeUser(data));
+    signInWithEmailAndPassword(data.login, data.password);
+  };
+
   return (
     <HomeContainer>
       <TitleStyled>Aluritter</TitleStyled>
-      <FormStyled onSubmit={ handleSubmit() }>
+      <FormStyled>
         <InputStyled
           type="text"
           id="login"
@@ -95,12 +113,14 @@ function SignIn() {
           </span>
         )}
 
-        <ButtonStyled>
-          Criar uma nova conta
+        <ButtonStyled onClick={ handleSubmit(onSubmit) }>
+          <Link to="/">
+            Acessar plataforma
+          </Link>
         </ButtonStyled>
       </FormStyled>
       <TextStyled>
-        Já possui um conta?
+        Não possui um conta?
         {' '}
         <Link
           to="/signup"
@@ -111,7 +131,7 @@ function SignIn() {
             fontWeight: 400,
             fontFamily: 'Roboto, sans-serif' } }
         >
-          Acesse agora!
+          Crie uma agora!
         </Link>
       </TextStyled>
     </HomeContainer>

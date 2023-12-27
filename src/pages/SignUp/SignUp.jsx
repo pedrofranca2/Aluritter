@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import validator from 'validator';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { useCreateUserWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import { ButtonStyled } from '../../components/ButtonStyled';
 import { InputStyled } from '../../components/InputStyled';
-import { changeUser } from '../../redux/userSlice';
+import { auth } from '../../services/firebaseConfig';
 
 const FormStyled = styled.form`
   display: flex;
@@ -44,17 +44,34 @@ const HomeContainer = styled.div`
 `;
 
 function SignUp() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const [
+    createUserWithEmailAndPassword,
+    user,
+    loading,
+  ] = useCreateUserWithEmailAndPassword(auth);
+
+  const handleSignUp = (data) => {
+    setIsSubmitting(true);
+    createUserWithEmailAndPassword(data.login, data.password);
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
-  const dispatch = useDispatch();
+  useEffect(() => {
+    if (user) {
+      navigate('/signin');
+    }
+  }, [user, navigate]);
 
-  const onSubmit = (data) => {
-    dispatch(changeUser(data));
-  };
+  if (isSubmitting || loading) {
+    return <p>Loading...</p>;
+  }
 
   return (
     <HomeContainer>
@@ -103,14 +120,12 @@ function SignUp() {
           </span>
         )}
 
-        <ButtonStyled onClick={ handleSubmit(onSubmit) }>
-          <Link to="/">
-            Acessar plataforma
-          </Link>
+        <ButtonStyled onClick={ handleSubmit(handleSignUp) }>
+          Criar uma nova conta
         </ButtonStyled>
       </FormStyled>
       <TextStyled>
-        Não possui um conta?
+        Já possui um conta?
         {' '}
         <Link
           to="/signin"
@@ -121,7 +136,7 @@ function SignUp() {
             fontWeight: 400,
             fontFamily: 'Roboto, sans-serif' } }
         >
-          Crie uma agora!
+          Acesse agora!
         </Link>
       </TextStyled>
     </HomeContainer>
