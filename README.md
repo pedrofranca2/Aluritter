@@ -1,10 +1,6 @@
 # Aluritter
 
- simple registration and login page providing access to a system for posting short texts.
-
-## Overview
-
-A brief overview of what your project is about.
+ Simple registration and login page providing access to a system for posting short texts.
 
 <details>
   <summary>🇺🇸 English Description (Click to expand)</summary>
