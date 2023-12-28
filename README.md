@@ -1,6 +1,6 @@
-# Project Name
+# Aluritter
 
-Short description of your project.
+ simple registration and login page providing access to a system for posting short texts.
 
 ## Overview
 
