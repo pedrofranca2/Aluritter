@@ -110,6 +110,9 @@ function Home() {
 
   const handleClick = (event) => {
     event.preventDefault();
+    if (textArea === '') {
+      return alert('Digite algo para aluritar');
+    }
     setSavedText((prevWords) => [...prevWords, textArea]);
     setTextArea('');
   };

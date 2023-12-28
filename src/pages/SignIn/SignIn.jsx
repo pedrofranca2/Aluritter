@@ -1,13 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useForm } from 'react-hook-form';
 import validator from 'validator';
-import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
+import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { ButtonStyled } from '../../components/ButtonStyled';
 import { InputStyled } from '../../components/InputStyled';
-import { changeUser } from '../../redux/userSlice';
 import { auth } from '../../services/firebaseConfig';
 
 const FormStyled = styled.form`
@@ -46,24 +44,27 @@ const HomeContainer = styled.div`
 `;
 
 function SignIn() {
+  const [authError, setAuthError] = useState(false);
+  const [authenticating, setAuthenticating] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const navigate = useNavigate();
 
-  const [
-    signInWithEmailAndPassword,
-    user,
-    loading,
-    error,
-  ] = useSignInWithEmailAndPassword(auth);
-
-  const dispatch = useDispatch();
-
-  const onSubmit = (data) => {
-    dispatch(changeUser(data));
-    signInWithEmailAndPassword(data.login, data.password);
+  const onSubmit = ({ login, password }) => {
+    setAuthenticating(true);
+    signInWithEmailAndPassword(auth, login, password)
+      .then((credential) => {
+        localStorage.setItem('access-token', credential.user.accessToken);
+        navigate('/');
+      })
+      .catch((error) => {
+        console.error(error.message);
+        setAuthError(true);
+      })
+      .finally(() => setAuthenticating(false));
   };
 
   return (
@@ -78,29 +79,28 @@ function SignIn() {
           className={ errors?.login && 'input-error' }
           { ...register('login', {
             required: true,
-            validate: (value) => validator.isEmail(value) }) }
+            validate: (value) => validator.isEmail(value),
+          }) }
         />
         {errors?.login?.type === 'required' && (
-          <span className="text-xs text-red-500 pl-1">
-            Email é obrigatório
-          </span>
+          <span className="text-xs text-red-500 pl-1">Email é obrigatório</span>
         )}
         {errors?.login?.type === 'validate' && (
-          <span className="text-xs text-red-500 pl-1">
-            E-mail inválido
-          </span>
+          <span className="text-xs text-red-500 pl-1">E-mail inválido</span>
         )}
         <InputStyled
           type="password"
           id="password"
           name="password"
           placeholder="Senha"
-          { ...register('password', { required: true, minLength: 6, maxLength: 10 }) }
+          { ...register('password', {
+            required: true,
+            minLength: 6,
+            maxLength: 10,
+          }) }
         />
         {errors?.password?.type === 'required' && (
-          <span className="text-xs text-red-500 pl-1">
-            Senha é obrigatória
-          </span>
+          <span className="text-xs text-red-500 pl-1">Senha é obrigatória</span>
         )}
         {errors?.password?.type === 'minLength' && (
           <span className="text-xs text-red-500 pl-1">
@@ -112,15 +112,18 @@ function SignIn() {
             Senha precisa ter entre 8 e 16 caracteres
           </span>
         )}
+        {authError ? (
+          <p className="text-xs text-red-500 text-center mt-3">
+            Email ou senha inválidos
+          </p>
+        ) : null}
 
-        <ButtonStyled onClick={ handleSubmit(onSubmit) }>
-          <Link to="/">
-            Acessar plataforma
-          </Link>
+        <ButtonStyled onClick={ handleSubmit(onSubmit) } disabled={ authenticating }>
+          Acessar plataforma
         </ButtonStyled>
       </FormStyled>
       <TextStyled>
-        Não possui um conta?
+        Não possui uma conta?
         {' '}
         <Link
           to="/signup"
@@ -129,7 +132,8 @@ function SignIn() {
             fontSize: '14px',
             lineHeight: '20px',
             fontWeight: 400,
-            fontFamily: 'Roboto, sans-serif' } }
+            fontFamily: 'Roboto, sans-serif',
+          } }
         >
           Crie uma agora!
         </Link>
