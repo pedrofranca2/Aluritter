@@ -1,8 +1,26 @@
+import { Route, Routes } from 'react-router-dom';
 import './App.css';
+import Home from './pages/Home/Home';
+import NotFound from './pages/NotFound/NotFound';
+import SignIn from './pages/SignIn/SignIn';
+import SignUp from './pages/SignUp/SignUp';
+import { PrivateRoute } from './PrivateRoute';
 
 function App() {
   return (
-    <h1 className="text-x1 font-bold text-red-500">Hello World</h1>
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <PrivateRoute>
+            <Home />
+          </PrivateRoute>
+        }
+      />
+      <Route path="/signin" element={ <SignIn /> } />
+      <Route path="/signup" element={ <SignUp /> } />
+      <Route path="*" element={ <NotFound /> } />
+    </Routes>
   );
 }
 
