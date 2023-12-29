@@ -54,7 +54,10 @@ function SignUp() {
 
   const handleSignUp = (data) => {
     setIsSubmitting(true);
-    createUserWithEmailAndPassword(data.login, data.password);
+    createUserWithEmailAndPassword(data.login, data.password)
+      .then((credential) => {
+        localStorage.setItem('access-token', credential.user.accessToken);
+      });
   };
 
   const {

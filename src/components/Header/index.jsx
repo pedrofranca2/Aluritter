@@ -1,7 +1,7 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { selectUser } from '../../redux/userSlice';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../../services/firebaseConfig';
 
 const HeaderStyled = styled.header`
 width: 100%;
@@ -43,13 +43,18 @@ color: #0EA5E9;
 `;
 
 function Header() {
-  const user = useSelector(selectUser);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem('access-token');
+    navigate('/signin');
+  };
 
   return (
     <HeaderStyled>
       <TitleStyled>aluritter</TitleStyled>
-      <UserStyled>{user.userData.login}</UserStyled>
-      <ButtonStyled>sair</ButtonStyled>
+      <UserStyled>{auth.currentUser.email}</UserStyled>
+      <ButtonStyled onClick={ handleLogout }>sair</ButtonStyled>
     </HeaderStyled>
   );
 }
